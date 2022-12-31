@@ -8,21 +8,53 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var emojiCount = 2
+    var emojis = ["✈️", "🚐", "🚀" , "🛴", "🚚",
+                  "🛩", "🚂", "🛰", "🛸", "🛶"]
+    
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(lineWidth: 2)
+        VStack{
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
+                    ForEach(emojis[0..<emojiCount], id: \.self) { emoji in
+                        CardView(content: emoji)
+                            .aspectRatio(2/3, contentMode: .fit)
+                    }
+                }
+            }
+            .foregroundColor(.red)
             
-            Text("Hello, world!")
-                .foregroundColor(.orange)
+            HStack {
+                remove
+                Spacer()
+                add
+            }
+            .font(.largeTitle)
+            .padding(.horizontal)
         }
         .padding(.horizontal)
-        .foregroundColor(.red)
+    }
+    
+    var add: some View {
+        Button {
+            emojiCount = emojiCount < emojis.count ? emojiCount + 1 : emojiCount
+        } label: {
+            Image(systemName: "plus.circle")
+        }
+    }
+    
+    var remove: some View {
+        Button {
+            emojiCount = emojiCount > 1 ? emojiCount - 1 : emojiCount
+        } label: {
+            Image(systemName: "minus.circle")
+        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .previewDevice("iPhone SE (3rd generation)")
     }
 }
