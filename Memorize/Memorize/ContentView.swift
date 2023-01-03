@@ -8,15 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var emojiCount = 2
-    var emojis = ["✈️", "🚐", "🚀" , "🛴", "🚚",
-                  "🛩", "🚂", "🛰", "🛸", "🛶"]
+    static let themes: [String: [String]] = [
+        "vehicles": ["✈️", "🚐", "🚀" , "🛴", "🚚", "🛩", "🚂", "🛰", "🛸", "🛶"],
+        "sports": ["🏉", "🎱", "🏓", "🪀", "🏸", "⚽️", "🏀", "🎾"],
+        "smiles": ["😀", "😄", "😉", "😂", "😍", "😎", "🥸", "🥳"]
+    ]
+    
+    @State var emojis = themes["vehicles"] ?? [] {
+        didSet {
+            emojisCount = Int.random(in: 4...emojis.count)
+        }
+    }
+    
+    @State var emojisCount: Int = 2
     
     var body: some View {
         VStack{
+            Text("Memorize!")
+                .font(.largeTitle)
             ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
-                    ForEach(emojis[0..<emojiCount], id: \.self) { emoji in
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))]) {
+                    ForEach(emojis[0..<emojisCount], id: \.self) { emoji in
                         CardView(content: emoji)
                             .aspectRatio(2/3, contentMode: .fit)
                     }
@@ -25,9 +37,11 @@ struct ContentView: View {
             .foregroundColor(.red)
             
             HStack {
-                remove
+                veichles
                 Spacer()
-                add
+                sports
+                Spacer()
+                smiles
             }
             .font(.largeTitle)
             .padding(.horizontal)
@@ -35,19 +49,39 @@ struct ContentView: View {
         .padding(.horizontal)
     }
     
-    var add: some View {
+    var veichles: some View {
         Button {
-            emojiCount = emojiCount < emojis.count ? emojiCount + 1 : emojiCount
+            emojis = (ContentView.themes["vehicles"] ?? []).shuffled()
         } label: {
-            Image(systemName: "plus.circle")
+            VStack {
+                Image(systemName: "car.rear")
+                Text("Vehicles")
+                    .font(.footnote)
+            }
         }
     }
     
-    var remove: some View {
+    var sports: some View {
         Button {
-            emojiCount = emojiCount > 1 ? emojiCount - 1 : emojiCount
+            emojis = (ContentView.themes["sports"] ?? []).shuffled()
         } label: {
-            Image(systemName: "minus.circle")
+            VStack {
+                Image(systemName: "basketball.fill")
+                Text("Sports")
+                    .font(.footnote)
+            }
+        }
+    }
+    
+    var smiles: some View {
+        Button {
+            emojis = (ContentView.themes["smiles"] ?? []).shuffled()
+        } label: {
+            VStack {
+                Image(systemName: "face.smiling.inverse")
+                Text("Smiles")
+                    .font(.footnote)
+            }
         }
     }
 }
