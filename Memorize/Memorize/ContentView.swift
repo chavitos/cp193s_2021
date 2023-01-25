@@ -20,7 +20,7 @@ struct ContentView: View {
         }
     }
     
-    @State var emojisCount: Int = 2
+    @State var emojisCount: Int = 4
     
     var body: some View {
         VStack{
