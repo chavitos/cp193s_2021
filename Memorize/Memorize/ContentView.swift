@@ -8,29 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
-    static let themes: [String: [String]] = [
-        "vehicles": ["✈️", "🚐", "🚀" , "🛴", "🚚", "🛩", "🚂", "🛰", "🛸", "🛶"],
-        "sports": ["🏉", "🎱", "🏓", "🪀", "🏸", "⚽️", "🏀", "🎾"],
-        "smiles": ["😀", "😄", "😉", "😂", "😍", "😎", "🥸", "🥳"]
-    ]
+    @ObservedObject var viewModel: EmojiMemoryGame
     
-    @State var emojis = themes["vehicles"] ?? [] {
-        didSet {
-            emojisCount = Int.random(in: 4...emojis.count)
-        }
-    }
-    
-    @State var emojisCount: Int = 4
+//    static let themes: [String: [String]] = [
+//        "vehicles": ["✈️", "🚐", "🚀" , "🛴", "🚚", "🛩", "🚂", "🛰", "🛸", "🛶"],
+//        "sports": ["🏉", "🎱", "🏓", "🪀", "🏸", "⚽️", "🏀", "🎾"],
+//        "smiles": ["😀", "😄", "😉", "😂", "😍", "😎", "🥸", "🥳"]
+//    ]
     
     var body: some View {
         VStack{
             Text("Memorize!")
                 .font(.largeTitle)
             ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))]) {
-                    ForEach(emojis[0..<emojisCount], id: \.self) { emoji in
-                        CardView(content: emoji)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
+                    ForEach(viewModel.cards) { card in
+                        CardView(card: card)
                             .aspectRatio(2/3, contentMode: .fit)
+                            .onTapGesture {
+                                viewModel.choose(card)
+                            }
                     }
                 }
             }
@@ -51,7 +48,7 @@ struct ContentView: View {
     
     var veichles: some View {
         Button {
-            emojis = (ContentView.themes["vehicles"] ?? []).shuffled()
+//            emojis = (ContentView.themes["vehicles"] ?? []).shuffled()
         } label: {
             VStack {
                 Image(systemName: "car.rear")
@@ -63,7 +60,7 @@ struct ContentView: View {
     
     var sports: some View {
         Button {
-            emojis = (ContentView.themes["sports"] ?? []).shuffled()
+//            emojis = (ContentView.themes["sports"] ?? []).shuffled()
         } label: {
             VStack {
                 Image(systemName: "basketball.fill")
@@ -75,7 +72,7 @@ struct ContentView: View {
     
     var smiles: some View {
         Button {
-            emojis = (ContentView.themes["smiles"] ?? []).shuffled()
+//            emojis = (ContentView.themes["smiles"] ?? []).shuffled()
         } label: {
             VStack {
                 Image(systemName: "face.smiling.inverse")
@@ -88,7 +85,8 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        let game = EmojiMemoryGame()
+        ContentView(viewModel: game)
             .previewDevice("iPhone SE (3rd generation)")
     }
 }
