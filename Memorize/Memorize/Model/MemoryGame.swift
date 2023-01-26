@@ -8,7 +8,9 @@
 import Foundation
   
 struct MemoryGame<CardContent: Equatable> {
-    private(set) var cards: Array<Card>
+    private(set) var theme: Theme<CardContent>
+    private(set) var cards: [Card] = []
+    private(set) var score: Int = 0
     private var indexOfFaceUpCard: Int?
     
     mutating func choose(_ card: Card) {
@@ -17,10 +19,24 @@ struct MemoryGame<CardContent: Equatable> {
               !cards[chosenIndex].isMatch else { return }
         
         if let potentialMatchIndex = indexOfFaceUpCard {
-            if cards[chosenIndex].content == cards[potentialMatchIndex].content {
+            if card.content == cards[potentialMatchIndex].content {
                 cards[chosenIndex].isMatch = true
                 cards[potentialMatchIndex].isMatch = true
+                
+                score += 2
+            } else {
+                if cards[potentialMatchIndex].alreadySeen {
+                    score -= 1
+                }
+                
+                if cards[chosenIndex].alreadySeen {
+                    score -= 1
+                }
+                
+                cards[potentialMatchIndex].alreadySeen = true
+                cards[chosenIndex].alreadySeen = true
             }
+            
             indexOfFaceUpCard = nil
         } else {
             for index in cards.indices {
@@ -32,20 +48,22 @@ struct MemoryGame<CardContent: Equatable> {
         cards[chosenIndex].isFaceUp.toggle()
     }
     
-    init(numberOfPairsOfCards: Int, createCardContent: (Int) -> CardContent) {
-        self.cards = Array<Card>()
-        
-        for pairIndex in 0..<numberOfPairsOfCards {
-            let content = createCardContent(pairIndex)
+    init(theme: Theme<CardContent>) {
+        self.theme = theme
+        for pairIndex in 0..<theme.cardsToShow {
+            let content = theme.content[pairIndex]
             cards.append(Card(content: content, id: pairIndex*2))
             cards.append(Card(content: content, id: pairIndex*2+1))
         }
+        
+        cards.shuffle()
     }
     
     struct Card: Identifiable {
         var isFaceUp: Bool = false
         var isMatch: Bool = false
         var content: CardContent
+        var alreadySeen: Bool = false
         var id: Int
     }
 }
