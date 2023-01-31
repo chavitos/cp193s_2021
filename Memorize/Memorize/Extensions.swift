@@ -22,4 +22,8 @@ extension Array {
         }
         return 0
     }
+    
+    var oneAndOnly: Element? {
+        count == 1 ? first : nil
+    }
 }
