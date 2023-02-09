@@ -25,21 +25,16 @@ struct EmojiMemoryGameView: View {
             }
             .padding()
             Divider()
-            
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(game.cards) { card in
-                        CardView(card: card)
-                            .aspectRatio(2/3, contentMode: .fit)
-                            .onTapGesture {
-                                game.choose(card)
-                            }
+            AspectVGrid(items: game.cards, aspectRatio: 2/3) { card in
+                CardView(card: card)
+                    .padding(4)
+                    .onTapGesture {
+                        game.choose(card)
                     }
-                }
             }
             .foregroundColor(game.themeColor)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
 }
 
