@@ -13,31 +13,26 @@ struct CardView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-                if card.isFaceUp {
-                    shape.fill().foregroundColor(.white)
-                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
-                    Pie(startAngle: Angle(degrees: -90), endAngle: Angle(degrees: -340))
-                        .padding(DrawingConstants.circlePadding)
-                        .opacity(DrawingConstants.circleOpacity)
-                    Text(card.content).font(font(in: geometry.size))
-                } else if card.isMatched {
-                    shape.opacity(0)
-                } else {
-                    shape.fill()
-                }
+                Pie(startAngle: Angle(degrees: -90), endAngle: Angle(degrees: -340))
+                    .padding(DrawingConstants.circlePadding)
+                    .opacity(DrawingConstants.circleOpacity)
+                Text(card.content)
+                    .rotationEffect(Angle.degrees(card.isMatched ? 360 : 0))
+                    .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: card.isMatched)
+                    .font(Font.system(size: DrawingConstants.fontSize))
+                    .scaleEffect(scale(thatFits: geometry.size))
             }
+            .cardify(isFaceUp: card.isFaceUp)
         }
     }
     
-    private func font(in size: CGSize) -> Font {
-        Font.system(size: min(size.width, size.height) * DrawingConstants.fontScale)
+    private func scale(thatFits size: CGSize) -> CGFloat {
+        min(size.width, size.height) / (DrawingConstants.fontSize / DrawingConstants.fontScale)
     }
     
     private struct DrawingConstants {
-        static let cornerRadius: CGFloat = 20
-        static let lineWidth: CGFloat = 3
         static let fontScale: CGFloat = 0.6
+        static let fontSize: CGFloat = 32
         static let circlePadding: CGFloat = 5
         static let circleOpacity: Double = 0.5
     }
@@ -50,11 +45,15 @@ struct CardView_Previews: PreviewProvider {
         let card3 = MemoryGame<String>.Card(content: "👤", id: 3)
         let card4 = MemoryGame<String>.Card(content: "👤", id: 4)
         
-        HStack {
-            CardView(card: card1)
-            CardView(card: card2)
-            CardView(card: card3)
-            CardView(card: card4)
+        VStack {
+            HStack {
+                CardView(card: card1)
+                CardView(card: card2)
+            }
+            HStack {
+                CardView(card: card3)
+                CardView(card: card4)
+            }
         }
         .padding(10)
         .previewDevice("iPhone SE (3rd generation)")
